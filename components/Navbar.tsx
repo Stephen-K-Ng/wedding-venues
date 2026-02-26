@@ -27,18 +27,18 @@ export default function Navbar() {
             >
               Browse Venues
             </Link>
-            <a
-              href="#"
+            <Link
+              href="/#how-it-works"
               className="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors"
             >
               How It Works
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/list-your-venue"
               className="bg-rose-600 text-white text-sm font-medium px-4 py-2 rounded-full hover:bg-rose-700 transition-colors"
             >
               List Your Venue
-            </a>
+            </Link>
           </div>
         </div>
       </div>
