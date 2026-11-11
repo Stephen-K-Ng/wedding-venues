@@ -34,14 +34,13 @@ export default function Home() {
             <span className="text-rose-300">Wedding Venue</span>
           </h1>
           <p className="text-stone-200 text-lg mb-10">
-            Compare hundreds of venues by location, size, price, and style.
-            Real reviews from real couples.
+            Explore Napa, Sonoma and nearby wine country venues. Compare planning estimates and confirm details directly.
           </p>
           <div className="max-w-2xl mx-auto">
             <SearchBar large />
           </div>
           <p className="text-stone-300 text-sm mt-4">
-            {VENUES.length} venues across the US &mdash; updated daily
+            {VENUES.length} initial listings · details awaiting verification · illustrative photos
           </p>
         </div>
       </section>
@@ -50,9 +49,9 @@ export default function Home() {
       <section className="bg-rose-600 text-white">
         <div className="max-w-5xl mx-auto px-4 py-4 grid grid-cols-3 divide-x divide-rose-500">
           {[
-            { value: "500+", label: "Verified Venues" },
-            { value: "10K+", label: "Happy Couples" },
-            { value: "50", label: "States Covered" },
+            { value: String(VENUES.length), label: "Initial Listings" },
+            { value: "Wine Country", label: "Our Focus" },
+            { value: "MVP", label: "Early Preview" },
           ].map((stat) => (
             <div key={stat.label} className="text-center px-4">
               <div className="text-2xl font-bold">{stat.value}</div>
@@ -95,7 +94,7 @@ export default function Home() {
                 Featured Venues
               </h2>
               <p className="text-stone-500">
-                Handpicked by our team for exceptional experiences
+                A starting point for your wine country shortlist
               </p>
             </div>
             <Link
@@ -135,21 +134,21 @@ export default function Home() {
               step: "01",
               title: "Search & Filter",
               description:
-                "Enter your location and use our filters to narrow by date, capacity, price, and style. See real-time results instantly.",
+                "Search by name, city or style. Filter by estimated capacity and budget band. Availability is not live.",
               icon: "🔍",
             },
             {
               step: "02",
               title: "Compare Venues",
               description:
-                "Side-by-side pricing, photo galleries, amenity lists, and verified couple reviews help you make the perfect choice.",
+                "Review clearly labeled prototype estimates. Photos are inspiration; listing details still need source verification.",
               icon: "⚖️",
             },
             {
               step: "03",
-              title: "Book Directly",
+              title: "Confirm with the Venue",
               description:
-                "Contact venues directly through our platform to schedule tours and secure your dream wedding date.",
+                "Request an itemized quote and confirm wedding eligibility, date availability and contract terms directly with the venue.",
               icon: "💍",
             },
           ].map(({ step, title, description, icon }) => (
@@ -178,8 +177,7 @@ export default function Home() {
             Ready to find your venue?
           </h2>
           <p className="text-rose-100 mb-7">
-            Join thousands of couples who found their dream wedding venue on
-            VenueFind.
+            Start a shortlist for your Napa or Sonoma celebration.
           </p>
           <Link
             href="/venues"

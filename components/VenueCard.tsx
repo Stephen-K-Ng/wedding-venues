@@ -1,3 +1,4 @@
+import { pricingFor } from "@/lib/evidence";
 import Link from "next/link";
 import { Venue } from "@/lib/types";
 
@@ -17,7 +18,7 @@ const STYLE_EMOJI: Record<string, string> = {
 };
 
 export default function VenueCard({ venue }: VenueCardProps) {
-  const stars = Array.from({ length: 5 }, (_, i) => i + 1);
+  const price = pricingFor(venue);
 
   return (
     <Link href={`/venues/${venue.id}`} className="group block">
@@ -27,7 +28,8 @@ export default function VenueCard({ venue }: VenueCardProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={venue.images[0]}
-            alt={venue.name}
+            alt="Illustrative wedding inspiration, not a verified venue photograph"
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
           {venue.featured && (
@@ -36,7 +38,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
             </div>
           )}
           <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-stone-700 text-xs font-bold px-2.5 py-1 rounded-full">
-            {venue.priceRange}
+            Illustrative photo
           </div>
         </div>
 
@@ -52,39 +54,14 @@ export default function VenueCard({ venue }: VenueCardProps) {
             {venue.location.city}, {venue.location.state}
           </p>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1.5 mt-2">
-            <div className="flex">
-              {stars.map((star) => (
-                <svg
-                  key={star}
-                  className={`w-3.5 h-3.5 ${
-                    star <= Math.round(venue.rating)
-                      ? "text-amber-400"
-                      : "text-stone-200"
-                  }`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="text-sm font-semibold text-stone-700">
-              {venue.rating.toFixed(1)}
-            </span>
-            <span className="text-sm text-stone-400">
-              ({venue.reviewCount} reviews)
-            </span>
-          </div>
-
+          <p className="text-xs text-amber-800 mt-2">Listing details awaiting verification</p>
           {/* Style & Capacity */}
           <div className="flex items-center gap-3 mt-3">
             <span className="inline-flex items-center gap-1 bg-stone-50 text-stone-600 text-xs font-medium px-2.5 py-1 rounded-full border border-stone-100">
               {STYLE_EMOJI[venue.style]} {venue.style}
             </span>
             <span className="text-xs text-stone-400">
-              Up to {venue.capacity.max} guests
+              Capacity estimate: {venue.capacity.max}
             </span>
           </div>
 
@@ -92,9 +69,10 @@ export default function VenueCard({ venue }: VenueCardProps) {
           <div className="mt-3 pt-3 border-t border-stone-50 flex items-center justify-between">
             <div>
               <span className="text-stone-900 font-bold text-lg">
-                ${venue.pricePerPerson}
+                {price.amount === null ? "Quote required" : `$${price.amount}`}
               </span>
-              <span className="text-stone-400 text-sm"> / person</span>
+              <span className="text-stone-400 text-sm">{price.amount === null ? "" : " / person"}</span>
+              <p className="text-xs text-amber-800 mt-1">{price.label}</p>
             </div>
             <span className="text-rose-600 text-sm font-medium group-hover:underline">
               View details →

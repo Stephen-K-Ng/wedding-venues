@@ -46,10 +46,11 @@ export default function SearchBar({
         </div>
         <input
           type="text"
+          aria-label="Search venues by city, style or name"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by city, style, or venue name..."
-          className={`flex-1 bg-transparent outline-none text-stone-800 placeholder-stone-300 ${
+          className={`min-w-0 flex-1 bg-transparent outline-none text-stone-800 placeholder-stone-300 ${
             large ? "text-base" : "text-sm"
           }`}
         />
