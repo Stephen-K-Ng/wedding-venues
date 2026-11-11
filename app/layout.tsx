@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-const geist = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "VenueFind – Wedding Venue Directory",
+  metadataBase: new URL("https://wedding-venues-one.vercel.app"),
+  alternates: {canonical: "/"},
+  openGraph: {title: "VenueFind | Napa & Sonoma Weddings", description: "Explore wine country venues with clearly labeled planning estimates.", type: "website"},
+  title: "Napa & Sonoma Wedding Venue Directory – VenueFind",
   description:
-    "Find and compare wedding venues by location, capacity, price, and style. Your dream venue is just a search away.",
+    "Explore Napa and Sonoma wedding venues with clearly labeled estimates. Confirm pricing, capacity and availability directly.",
 };
 
 export default function RootLayout({
@@ -21,9 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} antialiased bg-stone-50 text-stone-900`}>
+      <body className="antialiased bg-stone-50 text-stone-900">
         <Navbar />
         {children}
+        <footer className="text-center text-sm p-6 text-stone-600"><a href="/privacy" className="underline">Inquiry privacy</a> · Early directory preview</footer>
       </body>
     </html>
   );

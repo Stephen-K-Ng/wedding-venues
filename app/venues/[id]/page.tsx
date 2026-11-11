@@ -1,3 +1,6 @@
+import InquiryForm from "@/components/InquiryForm";
+import { inquiriesEnabled } from "@/lib/inquiry-config";
+import { pricingFor } from "@/lib/evidence";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -17,7 +20,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!venue) return { title: "Venue Not Found" };
   return {
     title: `${venue.name} – VenueFind`,
-    description: venue.description,
+    description: `Explore ${venue.name} in ${venue.location.city}. Confirm wedding eligibility and request a dated quote.`,
+    alternates: { canonical: `/venues/${venue.id}` },
   };
 }
 
@@ -37,7 +41,7 @@ export default async function VenueDetailPage({ params }: PageProps) {
   const venue = getVenueById(id);
   if (!venue) notFound();
 
-  const stars = Array.from({ length: 5 }, (_, i) => i + 1);
+  const price = pricingFor(venue);
 
   return (
     <main className="bg-stone-50 min-h-screen">
@@ -65,20 +69,20 @@ export default async function VenueDetailPage({ params }: PageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={venue.images[0]}
-                alt={venue.name}
+                alt="Illustrative celebration, not a verified photograph of this venue"
                 className="col-span-2 w-full h-72 object-cover"
               />
               {venue.images[1] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={venue.images[1]}
-                  alt={`${venue.name} interior`}
+                  alt="Wedding inspiration stock image"
                   className="w-full h-44 object-cover"
                 />
               )}
               {/* Placeholder for a third photo slot */}
               <div className="bg-stone-200 h-44 flex items-center justify-center rounded-br-2xl">
-                <span className="text-stone-400 text-sm">+ More photos</span>
+                <span className="text-stone-400 text-sm">Illustrative photos</span>
               </div>
             </div>
 
@@ -103,31 +107,8 @@ export default async function VenueDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Rating */}
-              <div className="flex items-center gap-2 mt-3">
-                <div className="flex">
-                  {stars.map((star) => (
-                    <svg
-                      key={star}
-                      className={`w-5 h-5 ${
-                        star <= Math.round(venue.rating)
-                          ? "text-amber-400"
-                          : "text-stone-200"
-                      }`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="font-bold text-stone-700 text-lg">
-                  {venue.rating.toFixed(1)}
-                </span>
-                <span className="text-stone-400">
-                  {venue.reviewCount} reviews
-                </span>
-              </div>
+              <p className="mt-3 text-sm text-amber-900">Unverified listing · confirm wedding eligibility, capacity and amenities directly. Photos below are illustrative stock images.</p>
+
             </div>
 
             {/* Quick stats */}
@@ -139,13 +120,13 @@ export default async function VenueDetailPage({ params }: PageProps) {
                   icon: STYLE_EMOJI[venue.style],
                 },
                 {
-                  label: "Capacity",
+                  label: "Capacity estimate",
                   value: `${venue.capacity.min}–${venue.capacity.max} guests`,
                   icon: "👥",
                 },
                 {
                   label: "Price",
-                  value: `$${venue.pricePerPerson}/person`,
+                  value: price.amount === null ? "Quote required" : `$${price.amount}/person (unverified)`,
                   icon: "💰",
                 },
               ].map(({ label, value, icon }) => (
@@ -165,7 +146,7 @@ export default async function VenueDetailPage({ params }: PageProps) {
             {/* Description */}
             <div className="bg-white rounded-2xl border border-stone-100 p-6">
               <h2 className="text-lg font-semibold text-stone-900 mb-3">
-                About This Venue
+                Prototype Description
               </h2>
               <p className="text-stone-600 leading-relaxed">
                 {venue.description}
@@ -175,7 +156,7 @@ export default async function VenueDetailPage({ params }: PageProps) {
             {/* Amenities */}
             <div className="bg-white rounded-2xl border border-stone-100 p-6">
               <h2 className="text-lg font-semibold text-stone-900 mb-4">
-                Amenities & Features
+                Amenities to Confirm
               </h2>
               <div className="grid grid-cols-2 gap-y-3">
                 {venue.amenities.map((amenity) => (
@@ -214,72 +195,16 @@ export default async function VenueDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Booking sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 sticky top-20">
-              <div className="text-center mb-5">
-                <div className="text-3xl font-bold text-stone-900">
-                  ${venue.pricePerPerson}
-                </div>
-                <div className="text-stone-400 text-sm">per person</div>
-                <div className="text-stone-500 text-sm mt-1">
-                  {venue.priceRange} · {venue.capacity.min}–{venue.capacity.max} guests
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-5">
-                <div>
-                  <label className="block text-xs font-semibold text-stone-500 mb-1 uppercase tracking-wide">
-                    Wedding Date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 text-stone-700"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-stone-500 mb-1 uppercase tracking-wide">
-                    Guest Count
-                  </label>
-                  <input
-                    type="number"
-                    placeholder={`${venue.capacity.min}–${venue.capacity.max}`}
-                    min={venue.capacity.min}
-                    max={venue.capacity.max}
-                    className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 placeholder-stone-300"
-                  />
-                </div>
-              </div>
-
-              <button className="w-full bg-rose-600 text-white font-semibold py-3 rounded-xl hover:bg-rose-700 transition-colors">
-                Request a Tour
-              </button>
-              <button className="w-full mt-2.5 border border-stone-200 text-stone-700 font-medium py-3 rounded-xl hover:bg-stone-50 transition-colors text-sm">
-                Save to Wishlist
-              </button>
-
-              <div className="mt-5 pt-5 border-t border-stone-50">
-                <div className="flex items-center gap-2 text-sm text-stone-500 mb-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Free consultation included
-                </div>
-                <div className="flex items-center gap-2 text-sm text-stone-500 mb-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Verified venue details
-                </div>
-                <div className="flex items-center gap-2 text-sm text-stone-500">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  No hidden booking fees
-                </div>
-              </div>
-            </div>
-          </div>
+          <aside className="lg:col-span-1 space-y-5">
+            <section className="bg-white rounded-2xl border border-stone-200 p-6">
+              <h2 className="text-xl font-semibold">{price.label}</h2>
+              {price.amount !== null && <p className="text-2xl font-bold mt-2">${price.amount} / person</p>}
+              <p className="text-sm text-stone-600 mt-3">{price.note}</p>
+              {price.source && <p className="text-sm mt-3"><a href={price.source} target="_blank" rel="noopener noreferrer" className="text-rose-700 underline">Official pricing policy</a> · checked {price.checked}. This source does not verify other listing fields.</p>}
+            </section>
+            <section className="bg-white rounded-2xl border p-6"><InquiryForm venueId={venue.id} enabled={inquiriesEnabled()}/></section>
+            <Link href="/honeymoon" className="block text-rose-700 underline">Plan a wine country honeymoon →</Link>
+          </aside>
         </div>
       </div>
     </main>

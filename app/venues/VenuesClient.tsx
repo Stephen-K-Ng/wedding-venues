@@ -1,13 +1,14 @@
 "use client";
 
+import { pricingFor } from "@/lib/evidence";
 import { useState, useMemo } from "react";
 import VenueCard from "@/components/VenueCard";
 import FilterPanel from "@/components/FilterPanel";
 import SearchBar from "@/components/SearchBar";
 import { VENUES, filterVenues } from "@/lib/venues";
-import { SearchFilters, VenueStyle, PriceRange } from "@/lib/types";
+import { SearchFilters, VenueStyle } from "@/lib/types";
 
-type SortOption = "rating" | "price-asc" | "price-desc" | "reviews";
+type SortOption = "name" | "price-asc" | "price-desc";
 
 interface VenuesClientProps {
   initialQuery: string;
@@ -28,21 +29,23 @@ export default function VenuesClient({
     styles: initialStyle ? [initialStyle as VenueStyle] : [],
   });
 
-  const [sort, setSort] = useState<SortOption>("rating");
+  const [sort, setSort] = useState<SortOption>("name");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const results = useMemo(() => {
     const filtered = filterVenues(VENUES, filters);
     return filtered.sort((a, b) => {
+      if (sort !== "name") {
+        if (pricingFor(a).amount === null) return 1;
+        if (pricingFor(b).amount === null) return -1;
+      }
       switch (sort) {
-        case "rating":
-          return b.rating - a.rating;
+        case "name":
+          return a.name.localeCompare(b.name);
         case "price-asc":
           return a.pricePerPerson - b.pricePerPerson;
         case "price-desc":
           return b.pricePerPerson - a.pricePerPerson;
-        case "reviews":
-          return b.reviewCount - a.reviewCount;
         default:
           return 0;
       }
@@ -109,6 +112,7 @@ export default function VenuesClient({
 
           {/* Results */}
           <div className="flex-1 min-w-0">
+            <p className="text-sm text-amber-900 bg-amber-50 p-3 rounded-xl mb-4">Early directory: prices and capacities are unverified prototype estimates. Photos are illustrative. Confirm wedding eligibility and availability directly; no live booking is offered.</p>
             {/* Results header */}
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -126,14 +130,14 @@ export default function VenuesClient({
                   Sort by:
                 </label>
                 <select
+                  aria-label="Sort venues"
                   value={sort}
                   onChange={(e) => setSort(e.target.value as SortOption)}
                   className="text-sm border border-stone-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-rose-300 text-stone-700"
                 >
-                  <option value="rating">Top Rated</option>
-                  <option value="reviews">Most Reviewed</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
+                  <option value="name">Venue name</option>
+                  <option value="price-asc">Prototype estimate: Low to High</option>
+                  <option value="price-desc">Prototype estimate: High to Low</option>
                 </select>
               </div>
             </div>

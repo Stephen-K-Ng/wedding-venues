@@ -14,7 +14,7 @@ const STYLES: VenueStyle[] = [
 ];
 
 const PRICE_RANGES: { value: PriceRange; label: string }[] = [
-  { value: "$", label: "$ Under $100/pp" },
+  { value: "$", label: "$ Under $100/pp estimate" },
   { value: "$$", label: "$$ $100–$150/pp" },
   { value: "$$$", label: "$$$ $150–$200/pp" },
   { value: "$$$$", label: "$$$$ $200+/pp" },
@@ -79,7 +79,7 @@ export default function FilterPanel({
     filters.state;
 
   return (
-    <aside className="w-72 shrink-0">
+    <aside className="w-full lg:w-72 shrink-0">
       <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-5 sticky top-20">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-semibold text-stone-900">Filters</h2>
@@ -105,11 +105,13 @@ export default function FilterPanel({
             <input
               type="text"
               placeholder="City"
+              aria-label="Filter by city"
               value={filters.city}
               onChange={(e) => onChange({ ...filters, city: e.target.value })}
               className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent placeholder-stone-300"
             />
             <select
+              aria-label="Filter by state"
               value={filters.state}
               onChange={(e) => onChange({ ...filters, state: e.target.value })}
               className="w-full text-sm border border-stone-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent text-stone-600"
@@ -129,10 +131,10 @@ export default function FilterPanel({
           </div>
         </div>
 
-        {/* Price Range */}
+        {/* Prototype Budget Band */}
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-stone-700 mb-2.5">
-            Price Range
+            Prototype Budget Band
           </h3>
           <div className="space-y-1.5">
             {PRICE_RANGES.map(({ value, label }) => (
@@ -157,7 +159,7 @@ export default function FilterPanel({
         {/* Capacity */}
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-stone-700 mb-2.5">
-            Guest Capacity
+            Estimated Guest Capacity
           </h3>
           <div className="space-y-1.5">
             {CAPACITY_OPTIONS.map(({ label, min, max }) => {

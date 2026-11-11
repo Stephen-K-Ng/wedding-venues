@@ -1,6 +1,7 @@
+import { pricingFor } from "./evidence";
 import { Venue, SearchFilters } from "./types";
 
-export const VENUES: Venue[] = [
+const ORIGINAL_VENUES: Venue[] = [
   {
     id: "1",
     name: "Stanly Ranch",
@@ -1253,10 +1254,15 @@ export const VENUES: Venue[] = [
   },
 ];
 
+// Preserve original records; derive consistent prototype budget bands.
+export const VENUES: Venue[] = ORIGINAL_VENUES.map(v => ({
+  ...v, priceRange: v.pricePerPerson < 100 ? '$' : v.pricePerPerson < 150 ? '$$' : v.pricePerPerson < 200 ? '$$$' : '$$$$',
+}));
+
 export function filterVenues(venues: Venue[], filters: SearchFilters): Venue[] {
   return venues.filter((venue) => {
     if (filters.query) {
-      const q = filters.query.toLowerCase();
+      const q = filters.query.trim().toLowerCase();
       const matchesText =
         venue.name.toLowerCase().includes(q) ||
         venue.location.city.toLowerCase().includes(q) ||
@@ -1290,7 +1296,7 @@ export function filterVenues(venues: Venue[], filters: SearchFilters): Venue[] {
 
     if (
       filters.priceRanges.length > 0 &&
-      !filters.priceRanges.includes(venue.priceRange)
+      (pricingFor(venue).amount === null || !filters.priceRanges.includes(venue.priceRange))
     ) {
       return false;
     }
